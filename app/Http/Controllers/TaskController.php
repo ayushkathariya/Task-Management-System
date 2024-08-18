@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Task;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 class TaskController extends Controller
 {
@@ -13,7 +14,9 @@ class TaskController extends Controller
      */
     public function index()
     {
-        $tasks = Task::orderBy("created_at", "desc")->paginate(6);
+        $user = Auth::user();
+
+        $tasks = Task::where('user_id', $user->id)->orderBy("created_at", "desc")->paginate(6);
 
         return view('home', ['tasks' => $tasks]);
     }
@@ -31,6 +34,15 @@ class TaskController extends Controller
      */
     public function store(Request $request)
     {
+
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'body' => 'required|string',
+            'user_id' => 'required|exists:users,id',
+            'is_completed' => 'boolean',
+            'deadline' => 'required|date|after_or_equal:now',
+        ]);
+
         $title = $request->title;
         $body = $request->body;
         $deadline = $request->deadline;
@@ -58,6 +70,8 @@ class TaskController extends Controller
      */
     public function edit(Task $task)
     {
+        Gate::authorize('update', $task);
+
         return view('tasks-edit', [
             'task' => $task
         ]);
@@ -68,6 +82,16 @@ class TaskController extends Controller
      */
     public function update(Request $request, Task $task)
     {
+        Gate::authorize('update', $task);
+
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'body' => 'required|string',
+            'user_id' => 'required|exists:users,id',
+            'is_completed' => 'boolean',
+            'deadline' => 'required|date|after_or_equal:now',
+        ]);
+
         $title = $request->title;
         $body = $request->body;
         $deadline = $request->deadline;
@@ -87,6 +111,8 @@ class TaskController extends Controller
      */
     public function destroy(Task $task)
     {
+        Gate::authorize('delete', $task);
+
         $task->delete();
 
         return redirect(route('home'));

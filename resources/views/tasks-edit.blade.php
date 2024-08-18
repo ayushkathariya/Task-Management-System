@@ -19,22 +19,34 @@
                 <label for="title" class="form-label">Title</label>
                 <input type="text" name="title" value="{{ $task->title }}" class="form-control" id="title"
                     aria-describedby="emailHelp">
+                @error('title')
+                    <div class="text-danger mt-1">{{ $message }}</div>
+                @enderror
             </div>
             <div class="mb-3">
                 <label for="body" class="form-label">Body</label>
                 <textarea rows="4" name="body" class="form-control" id="body">
                     {{ $task->body }}
                 </textarea>
+                @error('body')
+                    <div class="text-danger mt-1">{{ $message }}</div>
+                @enderror
             </div>
             <div class="mb-3">
                 <label for="deadline" class="form-label">Deadline</label>
                 <input name="deadline" value="{{ $task->deadline }}" type="datetime-local" name="body"
                     class="form-control" id="deadline">
+                @error('deadline')
+                    <div class="text-danger mt-1">{{ $message }}</div>
+                @enderror
             </div>
             <div class="mb-3 form-check">
                 <input type="checkbox" name="is_completed" class="form-check-input" id="is_completed"
                     {{ $task->is_completed ? 'checked' : '' }}>
                 <label class="form-check-label" for="is_completed">Completed</label>
+                @error('is_completed')
+                    <div class="text-danger mt-1">{{ $message }}</div>
+                @enderror
             </div>
             <button type="submit" class="btn btn-primary">Submit</button>
         </form>
